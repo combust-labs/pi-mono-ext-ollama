@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright 2025
 
 /**
  * /ollama-delete command - Delete a model and its data

@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright 2025
 
 /**
  * Ollama prompt tool - send prompts to Ollama models and receive responses.

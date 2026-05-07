@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright 2025
 
 /**
  * /ollama-prompt command - Send a prompt to a model directly from chat

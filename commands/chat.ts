@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright 2025
 
 /**
  * /ollama-chat command - Quick chat completion with a single message

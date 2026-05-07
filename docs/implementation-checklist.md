@@ -1,7 +1,6 @@
 # Ollama Extension Implementation Checklist
 
 <!-- SPDX-License-Identifier: Apache-2.0 -->
-<!-- Copyright 2025 -->
 
 ## Phase 1: Project Setup - ✅ COMPLETE
 
