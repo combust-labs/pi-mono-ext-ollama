@@ -1,0 +1,6 @@
+{
+  "baseUrl": "http://localhost:11434",
+  "authToken": "",
+  "defaultModel": "llama3.2",
+  "timeout": 120000
+}
