@@ -194,20 +194,28 @@
 - [x] Add CHANGELOG.md
   - [x] Document initial release
 
-## Phase 10: Future Enhancements (Out of Scope for v1) - ⏭️ DEFERRED
+## Phase 10: Future Enhancements - ❌ NOT PLANNED
 
+### Completed
+- [x] Custom renderers for model info display
+  - [x] Create `renderers/modelShow.ts` - rich panel for model details
+  - [x] Create `renderers/modelList.ts` - table-style available models list
+  - [x] Create `renderers/runningList.ts` - running models with expiry indicators
+  - [x] Create `renderers/index.ts` - barrel re-export
+  - [x] Update `commands/show.ts` to use rich renderer via `ctx.ui.custom()`
+  - [x] Update `commands/models.ts` to use rich renderer via `ctx.ui.custom()`
+  - [x] Update `commands/running.ts` to use rich renderer via `ctx.ui.custom()`
+
+### Not Planned
 - [ ] Multi-turn conversation support
-  - [ ] Store message history in session
-  - [ ] Add `/ollama-chat` with history flag
 - [ ] Model aliases normalization
 - [ ] Streaming responses for tool (accumulated chunks)
-- [ ] Custom renderers for model info display
 
 ---
 
 ## Summary
 
-**Total Files Created:** 32
+**Total Files Created:** 36
 
 **Source Files:**
 - `index.ts` - Main extension entry point
@@ -228,6 +236,12 @@
 - `commands/version.ts`
 - `commands/chat.ts`
 - `commands/index.ts`
+
+**Renderers:**
+- `renderers/modelShow.ts` - Rich panel for `/ollama-show`
+- `renderers/modelList.ts` - Table view for `/ollama-models`
+- `renderers/runningList.ts` - Status list for `/ollama-running`
+- `renderers/index.ts` - Barrel re-export
 
 **Tests:**
 - `test/support/helpers.ts`
