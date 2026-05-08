@@ -6,7 +6,6 @@
 
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { BorderedLoader } from "@mariozechner/pi-coding-agent";
-import { Text } from "@mariozechner/pi-tui";
 import { loadConfig } from "../config.js";
 import { generate } from "../client.js";
 
@@ -119,18 +118,9 @@ export function registerOllamaPromptCommand(pi: ExtensionAPI): void {
         );
 
         if (response === null) {
-          // User cancelled (ESC) - display in red, no prefix (matches pi-mono behavior)
-          await (ctx.ui.custom as (cb: (...args: any[]) => unknown) => Promise<void>)(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (_tui: any, _theme: any, _kb: any, done: any) => {
-              const container: any = {};
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              container.render = (w: number) => new Text((_theme as any).fg("error", "Operation aborted"), 1, 0).render(w);
-              container.invalidate = () => {};
-              container.handleInput = (_data: string) => { done(); };
-              return container;
-            }
-          );
+          // User cancelled (ESC) - display in red in status bar (non-blocking)
+          ctx.ui.setStatus("ollama-abort", ctx.ui.theme.fg("error", "Operation aborted"));
+          setTimeout(() => ctx.ui.setStatus("ollama-abort", undefined), 3000);
         } else {
           ctx.ui.notify(`Response from ${resolvedModel}:\n${response}`, "info");
         }
