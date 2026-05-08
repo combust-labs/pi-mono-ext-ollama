@@ -11,9 +11,10 @@ import type { Static } from "typebox";
 import { loadConfig } from "../config.js";
 import { generate } from "../client.js";
 import type { OllamaPromptResult } from "../types.js";
+import { OLLAMA_PROMPT_CUSTOM_TYPE } from "../commands/prompt.js";
 
 export const OllamaPromptSchema = Type.Object({
-  model: Type.String({ description: "Ollama model name (e.g., 'llama3.2', 'codellama:code')" }),
+  model: Type.String({ description: "Ollama model name (e.g., 'llama3.2', 'codellama:code', or 'default')" }),
   prompt: Type.String({ description: "The prompt to send to the model" }),
   system: Type.Optional(Type.String({ description: "Optional system prompt override" })),
   options: Type.Optional(Type.Object({
@@ -36,6 +37,19 @@ export const OllamaPromptSchema = Type.Object({
 export type OllamaPromptParams = Static<typeof OllamaPromptSchema>;
 
 /**
+ * Resolve model name: "default" -> config.defaultModel, identity otherwise
+ */
+function resolveModel(model: string, config: { defaultModel?: string }): string {
+  if (model === "default") {
+    if (!config.defaultModel) {
+      throw new Error("No default model configured. Set 'defaultModel' in your config file.");
+    }
+    return config.defaultModel;
+  }
+  return model;
+}
+
+/**
  * Register the ollama-prompt tool with the extension API
  */
 export function registerOllamaPromptTool(pi: ExtensionAPI): void {
@@ -55,7 +69,7 @@ The tool uses the Ollama /api/generate endpoint with streaming disabled by defau
 to return the complete response at once.
 
 Parameters:
-- model: The name of the Ollama model to use (e.g., 'llama3.2', 'codellama:code')
+- model: The name of the Ollama model to use (e.g., 'llama3.2', 'codellama:code', or 'default')
 - prompt: The input prompt for the model
 - system (optional): Override the default system prompt
 - options (optional): Generation parameters like temperature, top_p, seed, etc.
@@ -65,7 +79,7 @@ Parameters:
     parameters: OllamaPromptSchema,
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async execute(_toolCallId: any, params: OllamaPromptParams, signal: any, _onUpdate: any, _ctx: any): Promise<OllamaPromptResult> {
+    async execute(_toolCallId: any, params: OllamaPromptParams, signal: any, _onUpdate: any, ctx: any): Promise<OllamaPromptResult> {
       // Validate required parameters
       const model = (params.model ?? "").trim();
       const prompt = (params.prompt ?? "").trim();
@@ -81,8 +95,8 @@ Parameters:
       // Load configuration
       const config = await loadConfig();
 
-      // Use default model if configured and not specified
-      const modelToUse = config.defaultModel && !params.model ? config.defaultModel : model;
+      // Resolve "default" to configured defaultModel
+      const modelToUse = resolveModel(model, config);
 
       // Build request parameters
       const requestParams: {
@@ -114,7 +128,15 @@ Parameters:
         // Make the API request
         const response = await generate(config, requestParams);
 
-        // Return the response
+        // Insert info box into chat history immediately (not forwarded to LLM)
+        if (ctx?.pi) {
+          ctx.pi.sendMessage({
+            customType: OLLAMA_PROMPT_CUSTOM_TYPE,
+            content: prompt,
+            display: true,
+            details: { model: modelToUse, prompt },
+          });
+        }
         return {
           content: [{ type: "text", text: response.response }],
           details: {
